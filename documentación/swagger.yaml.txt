@@ -1,0 +1,311 @@
+swagger: "2.0"
+info:
+  description: "Proyecto Api-Rest para Resto. Desarrollo Web FullStack Globant-Acamida."
+  version: "1.0.0"
+  title: "Delilah Resto"
+  
+
+basePath: "/v2"
+
+tags:
+- name: "usuario"
+  description: "Registro y loggin de Usuarios"
+- name: "producto"
+  description: "Lista de productos"
+- name: "pedido"
+  description: "Info de ordenes creadas"
+  
+schemes:
+- "http"
+
+consumes:
+- "application/json"
+- "application/xml"
+produces:
+- "application/xml"
+- "application/json"
+
+paths:
+  /usuario/registro:
+    post:
+      tags:
+      - "usuario"
+      summary: "Registra un nuevo usuario"
+      description: ""
+      operationId: "crearUsuario"
+      parameters:
+      - in: "body"
+        name: "Data para registrar el usuario"
+        description: "Requiere informacion necesaria para completar los campos de usuario"
+        required: true
+        schema:
+          $ref: "#/definitions/usuario/registro"
+      responses:
+        "500":
+          description: "Erron con la base de datos acá"
+        "400":
+          description: "Error en el tipo de dato"
+        "201":
+          description: "El usuario se creo con exito"
+  /usuario/login:
+    post:
+      tags:
+      - "usuario"
+      summary: "Inicia seccion de usuario"
+      description: ""
+      operationId: "logIn"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Recibe parametros del body"
+        required: true
+        schema:
+          $ref: "#/definitions/usuario/login"
+      responses:
+        "500":
+          description: "Problemas con labase de datos"
+        "400":
+          description: "Usuario o contraseña incorrecto"
+        "200":
+          description: "Usuario logueado"
+  /producto:
+    get:
+      tags:
+      - "producto"
+      summary: "Retorna todos los productos"
+      description: "Retorna todo los producto que hay en la BD"
+      operationId: "traerProductos"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "token"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "500":
+          description: "Problema con la base de datos"
+        "200":
+          description: "Productos encontrados"
+    post:
+      tags:
+      - "producto"
+      summary: "Crear producto nuevo"
+      description: "Crea producto nuevo en BD"
+      operationId: "crearProducto"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Requiere data para completar campos de producto"
+        required: true
+        schema:
+          $ref: "#/definitions/producto"
+      - name: "token"
+        in: "header"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "500":
+          description: "Error con la base de datos"
+        "403":
+          description: "No es administrador"
+        "201":
+          description: "Producto creado"
+  put:
+      tags:
+      - "producto"
+      summary: "Actualiza un producto"
+      description: "Actualiza un producto creado en la D"
+      operationId: "actualizarProducto"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Requiere data para completar campos de producto"
+        required: true
+        schema:
+          $ref: "#/definitions/producto/:id"
+      - name: "token"
+        in: "header"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "500":
+          description: "Error con la base de datos"
+        "403":
+          description: "problemas de verificación"
+        "403":
+          description: "No es administrador"
+        "200":
+          description: "Producto modificado"        
+  /producto/{id}:
+    delete:
+      tags:
+      - "producto"
+      summary: "Elimina producto"
+      description: "Elimina producto de BD segun id"
+      operationId: "borrarProducto"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Producto id"
+        required: true
+        type: "number"
+      - name: "token"
+        in: "header"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "403":
+          description: "problemas de verificación"
+        "404":
+          description: "Error con la base de datos"
+        "200":
+          description: "Producto eliminado."
+  /pedido:
+    get:
+      tags:
+      - "pedido"
+      summary: "Retorna lista de pedidos"
+      description: "Retorna lista de pedidos segun tipo de usuario (isAdm true o false)"
+      operationId: "listaDeOrdenes"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "header"
+        name: "token"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "403":
+          description: "problemas de verificación"
+        "200":
+          description: "Lista de ordenes."
+    post:
+      tags:
+      - "pedido"
+      summary: "Crea un nuevo pedido"
+      description: "Crea un nuevo pedido en la BD"
+      operationId: "crarOrdenNueva"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Requiere data para completar campos de producto"
+        required: true
+        schema:
+          $ref: "#/definitions/producto/"
+      - name: "token"
+        in: "header"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "400":
+          description: "Error en el metodo de pago"
+        "400":
+          description: "La orden está vacía"
+        "500":
+          description: "El producto no se insertó, orden eliminada de la base de datos"
+        "201":
+          description: "La orden fue creada con exito"
+  /pedido/{id}:
+    delete:
+      tags:
+      - "pedido"
+      summary: "Borra una orden"
+      description: "Borra una orden segun el ID."
+      operationId: "borrarOrden"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Order id"
+        required: true
+        type: "number"
+      - name: "token"
+        in: "header"
+        description: "Token"
+        required: true
+        type: "string"
+      responses:
+        "403":
+          description: "problemas de verificación"
+        "500":
+          description: "Error con la base de datos"
+        "200":
+          description: "La orden fue eliminada con éxito"
+definitions:
+  usuario:
+    type: "object"
+    properties:
+      Username:
+        type: "string"
+      Password:
+        type: "string"
+      Email:
+        type: "string"
+      Telefono:
+        type: "string"
+      direccion:
+        type: "string"
+      isAdmin:
+        type: "boolean"
+    xml:
+      name: "usuario"
+  producto:
+    type: "object"
+    properties:
+      nombre:
+        type: "string"
+      categoria:
+        type: "string"
+      precio:
+        type: "number"
+    xml:
+      name: "Producto"
+  pedido:
+    type: "object"
+    properties:
+      metodoPago:
+        type: "string"
+        enum:
+        - "efectivo"
+        - "tarjeta"
+      productsArray:
+        type: "array"
+        items:
+          type: object
+          properties:
+            id:
+              type: "number"
+            cantidad:
+              type: "number"
+    xml:
+      name: "pedido"
+  
